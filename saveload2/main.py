@@ -60,7 +60,8 @@ class SaveLoad(QtCore.QObject):
             'backup ': self.prepare_backup,
             'restore ': self.restore,
             'confirm': self.confirm,
-            'cancel': self.cancel
+            'cancel': self.cancel,
+            'rm ': self.remove
         }
     
     def busy(self):
@@ -141,7 +142,7 @@ class SaveLoad(QtCore.QObject):
         else:
             try:
                 target = int(msg)
-            except ValueError:
+            except:
                 self.mclib.tell(player, '"{}" is not a valid integer'.format(msg))
                 return
         try:
@@ -192,3 +193,17 @@ class SaveLoad(QtCore.QObject):
             self.core.sig_server_stop.connect(restore)
         else:
             restore()
+    
+    def remove(self, player, msg):
+        if (self.config.permission_level == 'op') and not player.is_op():
+            self.mclib.tell(player, 'permission denied')
+            return
+        try:
+            target = int(msg)
+        except:
+            self.mclib.tell(player, '"{}" is not a valid integer'.format(msg))
+            return
+        if (target < 0) or (target >= len(self.info)):
+            self.mclib.tell(player, '{} is out of range'.format(target))
+        else:
+            self.info.pop(target)
