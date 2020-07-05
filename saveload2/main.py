@@ -69,7 +69,7 @@ class SaveLoad(QtCore.QObject):
     
     @QtCore.pyqtSlot(tuple)
     def on_input(self, msg):
-        player, text = msg
+        player, msg = msg
         if msg.startswith(SaveLoad.cmd_prefix):
             msg = msg[len(SaveLoad.cmd_prefix):]
             found = False
