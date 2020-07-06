@@ -1,5 +1,5 @@
 from PyQt5 import QtCore
-from . import utils, worker
+from . import utils, worker, conf
 
 class SaveLoad(QtCore.QObject):
     cmd_prefix = '!sl '
@@ -9,15 +9,13 @@ class SaveLoad(QtCore.QObject):
     sig_confirm_restore = QtCore.pyqtSignal()
     sig_cancel_restore = QtCore.pyqtSignal()
     
-    def __init__(self, log, core, config_filename, info_filename):
+    def __init__(self, log, core):
         super().__init__(core)
         SaveLoad.log = log
         self.core = core
-        SaveLoad.info_filename = info_filename
         
         # load config, data and dependency
         try:
-            SaveLoad.config = utils.Config(config_filename)
             self.info = utils.load_info()
             utils.confirm_backup_list(self.info)
             self.mclib = core.get_plugin('mcBasicLib')
@@ -87,7 +85,7 @@ class SaveLoad(QtCore.QObject):
             self.mclib.tell('@a', msg)
     
     def help(self, player, msg):
-        self.mclib.tell(player, SaveLoad.help_message)
+        self.mclib.tell(player, conf.help_message)
     
     def list(self, player, msg):
         message = '\n'.join(['{}: '.format(i) + utils.format_description(backup) for i, backup in enumerate(self.info)])
