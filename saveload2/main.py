@@ -109,6 +109,7 @@ class SaveLoad(QtCore.QObject):
             'creator': player.name,
             'description': backup_name
         }
+        self.broadcast('Start making backup')
         self.sig_prepare_backup.emit(backup_info)
         if self.core.server_running:
             self.core.write_server('/save-off')
@@ -152,6 +153,7 @@ class SaveLoad(QtCore.QObject):
             return
 
         self.busy_restore = True
+        self.broadcast('Preparing restoration, waiting for confirmation for {}s'.format(SaveLoad.config.restore_waiting))
         self.sig_prepare_restore.emit(target)
     
     def confirm(self, player, msg):
@@ -159,12 +161,14 @@ class SaveLoad(QtCore.QObject):
             self.mclib.tell(player, 'permission denied')
             return
         if self.busy_restore:
+            self.broadcast('restoration confirmed')
             self.sig_confirm_restore.emit()
     
     def cancel(self, player, msg):
         if self.busy_restore:
             self.sig_cancel_restore.emit()
             self.busy_restore = False
+            self.broadcast('canceled')
     
     @QtCore.pyqtSlot()
     def on_restore_timeout(self):
@@ -178,6 +182,7 @@ class SaveLoad(QtCore.QObject):
     @QtCore.pyqtSlot(dict)
     def on_restore_trigger(self, backup):
         target = utils.getfile(backup)
+        self.broadcast('start restoration, stop server')
         def restore():
             self.log.info('start restoration, console freeze')
             try:
@@ -207,3 +212,4 @@ class SaveLoad(QtCore.QObject):
             self.mclib.tell(player, '{} is out of range'.format(target))
         else:
             self.info.pop(target)
+            self.mclib.tell(player, 'backup {} is removed successfully'.format(target))
