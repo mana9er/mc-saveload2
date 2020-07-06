@@ -1,0 +1,8 @@
+{
+    "permission-level": "op",
+    "max-backup-num": 3,
+    "save-path": "waiting to be filled",
+    "format": "zip",
+    "restore-waiting-sec": 30,
+    "restore-countdown-sec": 15
+}
