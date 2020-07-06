@@ -65,7 +65,6 @@ class SaveLoad(QtCore.QObject):
     def busy(self):
         return self.busy_backup or self.busy_restore
     
-    @QtCore.pyqtSlot(tuple)
     def on_input(self, msg):
         player, msg = msg
         if msg.startswith(SaveLoad.cmd_prefix):
@@ -115,7 +114,6 @@ class SaveLoad(QtCore.QObject):
         else:
             self.sig_backup_immediately.emit()
     
-    @QtCore.pyqtSlot(dict)
     def on_backup_complete(self, backup_info):
         self.busy_backup = False
         self.info.append(backup_info)
@@ -168,16 +166,13 @@ class SaveLoad(QtCore.QObject):
             self.busy_restore = False
             self.broadcast('canceled')
     
-    @QtCore.pyqtSlot()
     def on_restore_timeout(self):
         self.broadcast('Restoration canceled: confirmation timeout')
         self.busy_restore = False
     
-    @QtCore.pyqtSlot(int)
     def on_restore_count(self, count):
         self.broadcast('Time before restoration: {}s'.format(count))
     
-    @QtCore.pyqtSlot(dict)
     def on_restore_trigger(self, backup):
         target = utils.getfile(backup)
         self.broadcast('start restoration, stop server')

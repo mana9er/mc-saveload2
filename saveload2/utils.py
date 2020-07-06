@@ -3,7 +3,7 @@ import os
 import json
 import shutil
 import time
-from .main import SaveLoad
+from . import main
 from zipfile import ZipFile, ZIP_DEFLATED
 
 class InitError(Exception):
@@ -14,7 +14,7 @@ def init_assert(expr, msg):
         raise InitError(msg)
         
 def dump_info(info):
-    filename = SaveLoad.info_filename
+    filename = main.SaveLoad.info_filename
     with open(filename, 'w', encoding='utf-8') as info_f:
         json.dump(info, info_f, indent=2)
 
@@ -25,10 +25,10 @@ def load_info():
         creator (player name, string)
         description (string)
     '''
-    filename = SaveLoad.info_filename
+    filename = main.SaveLoad.info_filename
     if not os.path.exists(filename):
-        SaveLoad.logger.warning('Failed to find previous backup infomation')
-        SaveLoad.logger.info('Creating empty info file...')
+        main.SaveLoad.log.warning('Failed to find previous backup infomation')
+        main.SaveLoad.log.info('Creating empty info file...')
         info = []
         dump_info(info)
         return info
@@ -47,7 +47,7 @@ def load_info():
     return info
 
 def getfile(info_dict):
-    return os.path.join(SaveLoad.config.save_path, 'backup-{}.zip'.format(info_dict['time']))
+    return os.path.join(main.SaveLoad.config.save_path, 'backup-{}.zip'.format(info_dict['time']))
 
 def confirm_backup_list(info_list):
     for i in reversed(range(len(info_list))):

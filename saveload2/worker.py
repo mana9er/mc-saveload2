@@ -1,9 +1,8 @@
 from PyQt5 import QtCore
-from .main import SaveLoad
-from . import utils
+from . import main, utils
 
 class BackupWorker(QtCore.QObject):
-    complete = QtCore.pyqtSignal()
+    complete = QtCore.pyqtSignal(dict)
     
     
     def __init__(self):
@@ -38,6 +37,7 @@ class CountdownWorker(QtCore.QObject):
     trigger = QtCore.pyqtSignal(dict)
     
     def __init__(self):
+        super().__init__()
         self.info = None
         self.state = 0
         # 0: waiting
@@ -45,46 +45,43 @@ class CountdownWorker(QtCore.QObject):
         # 2: counting down
         self.cur_count = 0
 
-        self.confirm_timer = QTimer()
-        self.confirm_timer.setInterval(SaveLoad.config.restore_waiting * 1000)
+        self.confirm_timer = QtCore.QTimer()
+        self.confirm_timer.setInterval(main.SaveLoad.config.restore_waiting * 1000)
         self.confirm_timer.setSingleShot(True)
         self.confirm_timer.timeout.connect(self.on_confirm_timeout)
-        self.countdown_timer = QTimer()
+        self.countdown_timer = QtCore.QTimer()
         self.countdown_timer.setInterval(1000)
         self.countdown_timer.timeout.connect(self.on_countdown)
 
-    @QtCore.pyqtSlot(dict)
     def start(self, info):
         self.info = info
         self.state = 1
         self.confirm_timer.start()
 
-    @QtCore.pyqtSlot()
     def on_confirm_timeout(self):
-        self.state = 0
-        self.info = None
-        self.timeout.emit()
+        if self.state == 1:
+            self.state = 0
+            self.info = None
+            self.timeout.emit()
 
-    @QtCore.pyqtSlot()
     def confirm(self):
         if self.state == 1:
             self.state = 2
             self.confirm_timer.stop()
-            self.cur_count = SaveLoad.config.restore_countdown
+            self.cur_count = main.SaveLoad.config.restore_countdown
             self.countdown_timer.start()
 
-    @QtCore.pyqtSlot()
     def on_countdown(self):
-        self.cur_count -= 1
-        if self.cur_count == 0:
-            self.countdown_timer.stop()
-            self.state = 0
-            self.trigger.emit(self.info)
-            self.info = None
-        else:
-            self.count.emit(self.cur_count)
+        if self.state == 2:
+            self.cur_count -= 1
+            if self.cur_count == 0:
+                self.countdown_timer.stop()
+                self.state = 0
+                self.trigger.emit(self.info)
+                self.info = None
+            else:
+                self.count.emit(self.cur_count)
 
-    @QtCore.pyqtSlot()
     def cancel(self):
         if self.state != 0:
             self.confirm_timer.stop()

@@ -1,4 +1,7 @@
-from utils import init_assert
+import sys
+import json
+import os
+from . import utils
 
 class Config:
     
@@ -13,13 +16,13 @@ class Config:
             self.restore_waiting = config_dict['restore-waiting-sec']
             self.restore_countdown = config_dict['restore-countdown-sec']
         except:
-            raise InitError(str(sys.exc_info()[0]) + str(sys.exc_info()[1]))
-        init_assert((permission_level == 'op') or (permission_level == 'any'), 'permission-level should be op or any')
-        init_assert(isinstance(self.max_backup_num, int) and (self.max_backup_num > 0), 'max-backup-num should be positive integer')
-        init_assert(os.path.isdir(self.save_path), 'save-path is not a valid directory')
-        init_assert(self.format == 'zip', 'currently support zip format only')
-        init_assert(isinstance(self.restore_waiting, int) and (self.restore_waiting > 0), 'restore-waiting-sec should be positive integer')
-        init_assert(isinstance(self.restore_countdown, int) and (self.restore_countdown > 0), 'restore-countdown-sec should be positive integer')
+            raise utils.InitError(str(sys.exc_info()[0]) + str(sys.exc_info()[1]))
+        utils.init_assert((self.permission_level == 'op') or (self.permission_level == 'any'), 'permission-level should be op or any')
+        utils.init_assert(isinstance(self.max_backup_num, int) and (self.max_backup_num > 0), 'max-backup-num should be positive integer')
+        utils.init_assert(os.path.isdir(self.save_path), 'save-path is not a valid directory')
+        utils.init_assert(self.format == 'zip', 'currently support zip format only')
+        utils.init_assert(isinstance(self.restore_waiting, int) and (self.restore_waiting > 0), 'restore-waiting-sec should be positive integer')
+        utils.init_assert(isinstance(self.restore_countdown, int) and (self.restore_countdown > 0), 'restore-countdown-sec should be positive integer')
 
 def load_text():
     global help_message
