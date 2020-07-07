@@ -57,6 +57,7 @@ def load_timer():
     with open(filename, 'r', encoding='utf-8') as timer_f:
         timer = int(timer_f.read())
     init_assert(timer > 0, 'Expecting positive timer')
+    return timer
 
 def getfile(info_dict):
     return os.path.join(conf.config.save_path, 'backup-{}.zip'.format(info_dict['time']))
