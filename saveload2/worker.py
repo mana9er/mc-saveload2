@@ -1,3 +1,4 @@
+import re
 from PyQt5 import QtCore
 from . import utils, conf
 
@@ -9,26 +10,26 @@ class BackupWorker(QtCore.QObject):
         super().__init__()
         self.info = None
     
-    @QtCore.pyqtSlot(dict)
     def prepare(self, info):
         self.info = info
     
     def start(self):
         if not self.info:
             return
+        conf.config.log.debug('start packing')
         utils.pack(utils.getfile(self.info))
+        conf.config.log.debug('complete packing')
         self.complete.emit(self.info)
         self.info = None
     
-    @QtCore.pyqtSlot(tuple)
-    def wait_flush(self, msg):
+    def wait_flush(self, lines):
         if not self.info:
             return
-        player, text = msg
-        match_obj = re.match(r'[^<>]*?\[Server thread/INFO\] \[minecraft/DedicatedServer\]: (.*)$', text)
-        if match_obj:
-            if match_obj.group(1).find('Saved the game') >= 0:
-                self.start()
+        for text in lines:
+            match_obj = re.match(r'[^<>]*?\[Server thread/INFO\] \[minecraft/DedicatedServer\]: (.*)$', text)
+            if match_obj:
+                if match_obj.group(1).find('Saved the game') >= 0:
+                    self.start()
 
 
 class CountdownWorker(QtCore.QObject):

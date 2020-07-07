@@ -1,3 +1,4 @@
+import time
 from PyQt5 import QtCore
 from . import utils, worker, conf
 
@@ -40,7 +41,7 @@ class SaveLoad(QtCore.QObject):
         self.mclib.sig_input.connect(self.on_input)
 
         self.sig_prepare_backup.connect(self.backup_worker.prepare) # carry backup info, F->T
-        self.mclib.sig_input.connect(self.backup_worker.wait_flush) # check if flush is completed
+        self.core.sig_server_output.connect(self.backup_worker.wait_flush) # check if flush is completed
         self.sig_backup_immediately.connect(self.backup_worker.start) # if not running, go ahead
         self.backup_worker.complete.connect(self.on_backup_complete) # carry backup info, T->F
 
