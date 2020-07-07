@@ -228,7 +228,7 @@ class SaveLoad(QtCore.QObject):
                 self.auto_backup_remain = conf.config.auto_backup_interval
                 self.busy_backup = True
                 backup_info = {
-                    'timer': int(time.time()),
+                    'time': int(time.time()),
                     'creator': 'plugin sl',
                     'description': 'auto backup'
                 }
