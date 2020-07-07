@@ -202,6 +202,9 @@ class SaveLoad(QtCore.QObject):
             restore()
     
     def remove(self, player, msg):
+        if self.busy():
+            self.mclib.tell(player, 'plugin busy')
+            return
         if (conf.config.permission_level == 'op') and not player.is_op():
             self.mclib.tell(player, 'permission denied')
             return
@@ -213,6 +216,7 @@ class SaveLoad(QtCore.QObject):
         if (target < 0) or (target >= len(self.info)):
             self.mclib.tell(player, '{} is out of range'.format(target))
         else:
+            utils.try_remove(self.info[target])
             self.info.pop(target)
             self.mclib.tell(player, 'backup {} is removed successfully'.format(target))
     
