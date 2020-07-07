@@ -4,5 +4,6 @@
     "save-path": "waiting to be filled",
     "format": "zip",
     "restore-waiting-sec": 30,
-    "restore-countdown-sec": 15
+    "restore-countdown-sec": 15,
+    "auto-backup-hours": 24
 }
