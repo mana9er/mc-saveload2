@@ -1,5 +1,5 @@
 from PyQt5 import QtCore
-from . import main, utils
+from . import utils, conf
 
 class BackupWorker(QtCore.QObject):
     complete = QtCore.pyqtSignal(dict)
@@ -46,7 +46,7 @@ class CountdownWorker(QtCore.QObject):
         self.cur_count = 0
 
         self.confirm_timer = QtCore.QTimer()
-        self.confirm_timer.setInterval(main.SaveLoad.config.restore_waiting * 1000)
+        self.confirm_timer.setInterval(conf.config.restore_waiting * 1000)
         self.confirm_timer.setSingleShot(True)
         self.confirm_timer.timeout.connect(self.on_confirm_timeout)
         self.countdown_timer = QtCore.QTimer()
@@ -68,7 +68,7 @@ class CountdownWorker(QtCore.QObject):
         if self.state == 1:
             self.state = 2
             self.confirm_timer.stop()
-            self.cur_count = main.SaveLoad.config.restore_countdown
+            self.cur_count = conf.config.restore_countdown
             self.countdown_timer.start()
 
     def on_countdown(self):

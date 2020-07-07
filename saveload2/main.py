@@ -94,7 +94,7 @@ class SaveLoad(QtCore.QObject):
         if self.busy():
             self.mclib.tell(player, 'plugin saveload busy')
             return
-        if (self.config.permission_level == 'op') and not player.is_op():
+        if (conf.config.permission_level == 'op') and not player.is_op():
             self.mclib.tell(player, 'permission denied')
             return
         self.busy_backup = True
@@ -117,7 +117,7 @@ class SaveLoad(QtCore.QObject):
     def on_backup_complete(self, backup_info):
         self.busy_backup = False
         self.info.append(backup_info)
-        while len(self.info) > self.config.max_backup_num:
+        while len(self.info) > conf.config.max_backup_num:
             utils.try_remove(self.info[0])
             self.info.pop(0)
         utils.dump_info(self.info)
@@ -130,7 +130,7 @@ class SaveLoad(QtCore.QObject):
         if self.busy():
             self.mclib.tell(player, 'plugin busy')
             return
-        if (self.config.permission_level == 'op') and not player.is_op():
+        if (conf.config.permission_level == 'op') and not player.is_op():
             self.mclib.tell(player, 'permission denied')
             return
         msg = msg.strip()
@@ -149,11 +149,11 @@ class SaveLoad(QtCore.QObject):
             return
 
         self.busy_restore = True
-        self.broadcast('Preparing restoration, waiting for confirmation for {}s'.format(SaveLoad.config.restore_waiting))
+        self.broadcast('Preparing restoration, waiting for confirmation for {}s'.format(conf.config.restore_waiting))
         self.sig_prepare_restore.emit(target)
     
     def confirm(self, player, msg):
-        if (self.config.permission_level == 'op') and not player.is_op():
+        if (conf.config.permission_level == 'op') and not player.is_op():
             self.mclib.tell(player, 'permission denied')
             return
         if self.busy_restore:
@@ -193,7 +193,7 @@ class SaveLoad(QtCore.QObject):
             restore()
     
     def remove(self, player, msg):
-        if (self.config.permission_level == 'op') and not player.is_op():
+        if (conf.config.permission_level == 'op') and not player.is_op():
             self.mclib.tell(player, 'permission denied')
             return
         try:

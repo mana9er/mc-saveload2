@@ -24,9 +24,11 @@ class Config:
         utils.init_assert(isinstance(self.restore_waiting, int) and (self.restore_waiting > 0), 'restore-waiting-sec should be positive integer')
         utils.init_assert(isinstance(self.restore_countdown, int) and (self.restore_countdown > 0), 'restore-countdown-sec should be positive integer')
 
+def load_config(filename):
+    return Config(filename)
+
 def load_text():
-    global help_message
-    help_message = ('"!sl help": show this help message.\n'
+    return ('"!sl help": show this help message.\n'
     '"!sl list": list the existing backups.\n'
     '"!sl backup [description]": make a backup for the current server status. You can add description by adding optional argument to the end.\n'
     '"!sl restore <last | int:id>": use the selected backup to restore the server. You can use keyword "last" to indicate the latest backup. This command requires confirmation.\n'
