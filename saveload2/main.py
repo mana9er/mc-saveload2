@@ -23,8 +23,8 @@ class SaveLoad(QtCore.QObject):
             self.mclib = core.get_plugin('mcBasicLib')
             if not self.mclib:
                 raise utils.InitError('dependency mcBasicLib not found.')
-        except utils.InitError as e:
-            self.log.error(e)
+        except:
+            self.log.error(str(sys.exc_info()[0]) + str(sys.exc_info()[1]))
             self.log.error('Plugin saveload is not going to work.')
             return
         

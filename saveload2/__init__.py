@@ -1,4 +1,5 @@
 import os
+import sys
 from . import main, conf, utils
 dependencies = ['mcBasicLib']
 
@@ -9,8 +10,8 @@ def load(log, core):
     timer_filename = os.path.join(root_dir, 'auto-backup-timer.txt')
     try:
         conf.config = conf.Config(config_filename)
-    except utils.InitError as e:
-        log.error(e)
+    except:
+        log.error(str(sys.exc_info()[0]) + str(sys.exc_info()[1]))
         log.error('Plugin saveload is not going to work.')
         return
     conf.config.info_filename = info_filename

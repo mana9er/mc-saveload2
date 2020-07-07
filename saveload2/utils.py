@@ -32,18 +32,13 @@ def load_info():
         info = []
         dump_info(info)
         return info
-    try:
-        with open(filename, 'r', encoding='utf-8') as info_f:
-            info = json.load(info_f)
-        init_assert(isinstance(info, list), 'When loading info file: top-level entity should be a list.')
-        for backup in info:
-            init_assert(isinstance(backup['time'], int), 'When loading info file: time should be integer')
-            init_assert(isinstance(backup['creator'], str), 'When loading info file: creator should be string')
-            init_assert(isinstance(backup['description'], str), 'When loading info file: description should be string')
-    except InitError:
-        raise
-    except:
-        raise InitError(str(sys.exc_info()[0]) + str(sys.exc_info()[1]))
+    with open(filename, 'r', encoding='utf-8') as info_f:
+        info = json.load(info_f)
+    init_assert(isinstance(info, list), 'When loading info file: top-level entity should be a list.')
+    for backup in info:
+        init_assert(isinstance(backup['time'], int), 'When loading info file: time should be integer')
+        init_assert(isinstance(backup['creator'], str), 'When loading info file: creator should be string')
+        init_assert(isinstance(backup['description'], str), 'When loading info file: description should be string')
     return info
 
 def dump_timer(timer):
@@ -59,14 +54,9 @@ def load_timer():
         timer = conf.config.auto_backup_interval
         dump_timer(timer)
         return timer
-    try:
-        with open(filename, 'r', encoding='utf-8') as timer_f:
-            timer = int(timer_f.read())
-        init_assert(timer > 0, 'Expecting positive timer')
-    except InitError:
-        raise
-    except:
-        raise InitError(str(sys.exc_info()[0]) + str(sys.exc_info()[1]))
+    with open(filename, 'r', encoding='utf-8') as timer_f:
+        timer = int(timer_f.read())
+    init_assert(timer > 0, 'Expecting positive timer')
 
 def getfile(info_dict):
     return os.path.join(conf.config.save_path, 'backup-{}.zip'.format(info_dict['time']))
