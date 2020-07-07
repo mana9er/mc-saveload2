@@ -46,6 +46,28 @@ def load_info():
         raise InitError(str(sys.exc_info()[0]) + str(sys.exc_info()[1]))
     return info
 
+def dump_timer(timer):
+    filename = conf.config.timer_filename
+    with open(filename, 'w', encoding='utf-8') as f:
+        f.write(str(timer))
+
+def load_timer():
+    filename = conf.config.timer_filename
+    if not os.path.exists(filename):
+        conf.config.log.warning('Failed to find previous auto backup timer')
+        conf.config.log.info('Creating new timer file')
+        timer = conf.config.auto_backup_interval
+        dump_timer(timer)
+        return timer
+    try:
+        with open(filename, 'r', encoding='utf-8') as timer_f:
+            timer = int(timer_f.read())
+        init_assert(timer > 0, 'Expecting positive timer')
+    except InitError:
+        raise
+    except:
+        raise InitError(str(sys.exc_info()[0]) + str(sys.exc_info()[1]))
+
 def getfile(info_dict):
     return os.path.join(conf.config.save_path, 'backup-{}.zip'.format(info_dict['time']))
 

@@ -15,6 +15,7 @@ class Config:
             self.format = config_dict['format']
             self.restore_waiting = config_dict['restore-waiting-sec']
             self.restore_countdown = config_dict['restore-countdown-sec']
+            self.auto_backup_interval = config_dict['auto-backup-hours']
         except:
             raise utils.InitError(str(sys.exc_info()[0]) + str(sys.exc_info()[1]))
         utils.init_assert((self.permission_level == 'op') or (self.permission_level == 'any'), 'permission-level should be op or any')
@@ -23,9 +24,8 @@ class Config:
         utils.init_assert(self.format == 'zip', 'currently support zip format only')
         utils.init_assert(isinstance(self.restore_waiting, int) and (self.restore_waiting > 0), 'restore-waiting-sec should be positive integer')
         utils.init_assert(isinstance(self.restore_countdown, int) and (self.restore_countdown > 0), 'restore-countdown-sec should be positive integer')
+        utils.init_assert(isinstance(self.auto_backup_interval, int) and (self.auto_backup_interval > 0), 'auto-backup-hours should be positive integer')
 
-def load_config(filename):
-    return Config(filename)
 
 def load_text():
     return ('"!sl help": show this help message.\n'

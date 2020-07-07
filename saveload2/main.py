@@ -18,6 +18,7 @@ class SaveLoad(QtCore.QObject):
         # load config, data and dependency
         try:
             self.info = utils.load_info()
+            self.auto_backup_remain = utils.load_timer()
             utils.confirm_backup_list(self.info)
             self.mclib = core.get_plugin('mcBasicLib')
             if not self.mclib:
@@ -27,12 +28,16 @@ class SaveLoad(QtCore.QObject):
             self.log.error('Plugin saveload is not going to work.')
             return
         
-        # create workers
+        # create workers, thread and timer
         worker_thread = QtCore.QThread(self)
         self.backup_worker = worker.BackupWorker()
         self.backup_worker.moveToThread(worker_thread)
         worker_thread.start()
         self.countdown_worker = worker.CountdownWorker()
+        self.auto_backup_timer = QtCore.QTimer()
+        self.auto_backup_timer.setInterval(60 * 60 * 1000)
+        self.auto_backup_timer.start()
+        self.auto_backup_timer.timeout.connect(self.on_auto_backup_count)
 
         # signal-slots and busy state
         # busy state transition is important
@@ -91,6 +96,14 @@ class SaveLoad(QtCore.QObject):
         message = '\n'.join(['{}: '.format(i) + utils.format_description(backup) for i, backup in enumerate(self.info)])
         self.mclib.tell(player, message)
     
+    def direct_backup(self, backup_info):
+        self.sig_prepare_backup.emit(backup_info)
+        if self.core.server_running:
+            self.core.write_server('/save-off')
+            self.core.write_server('/save-all flush')
+        else:
+            self.sig_backup_immediately.emit()
+    
     def prepare_backup(self, player, msg):
         if self.busy():
             self.mclib.tell(player, 'plugin saveload busy')
@@ -108,12 +121,7 @@ class SaveLoad(QtCore.QObject):
             'description': backup_name
         }
         self.broadcast('Start making backup')
-        self.sig_prepare_backup.emit(backup_info)
-        if self.core.server_running:
-            self.core.write_server('/save-off')
-            self.core.write_server('/save-all flush')
-        else:
-            self.sig_backup_immediately.emit()
+        self.direct_backup(backup_info)
     
     def on_backup_complete(self, backup_info):
         self.busy_backup = False
@@ -207,3 +215,23 @@ class SaveLoad(QtCore.QObject):
         else:
             self.info.pop(target)
             self.mclib.tell(player, 'backup {} is removed successfully'.format(target))
+    
+    def on_auto_backup_count(self):
+        self.auto_backup_remain -= 1
+        if self.auto_backup_remain <= 0:
+            if not self.busy():
+                self.auto_backup_remain = conf.config.auto_backup_interval
+                self.busy_backup = True
+                backup_info = {
+                    'timer': int(time.time()),
+                    'creator': 'plugin sl',
+                    'description': 'auto backup'
+                }
+                self.broadcast('Start auto backup')
+                self.direct_backup(backup_info)
+            else:
+                self.auto_backup_remain = 1
+                self.broadcast('Auto backup canceled due to busy status, retry 1h later')
+        utils.dump_timer(self.auto_backup_remain)
+        
+                
