@@ -1,3 +1,4 @@
+import sys
 import time
 from PyQt5 import QtCore
 from . import utils, worker, conf
