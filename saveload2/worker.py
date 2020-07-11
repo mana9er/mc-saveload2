@@ -26,7 +26,7 @@ class BackupWorker(QtCore.QObject):
         if not self.info:
             return
         for text in lines:
-            match_obj = re.match(r'[^<>]*?\[Server thread/INFO\] \[minecraft/DedicatedServer\]: (.*)$', text)
+            match_obj = re.match(r'[^<>]*?\[Server thread/INFO\].*?: (.*)$', text)
             if match_obj:
                 if match_obj.group(1).find('Saved the game') >= 0:
                     self.start()
