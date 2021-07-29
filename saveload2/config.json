@@ -5,5 +5,8 @@
     "format": "zip",
     "restore-waiting-sec": 30,
     "restore-countdown-sec": 15,
-    "auto-backup-hours": 24
+    "auto-backup-hours": 24,
+    "ignore": [
+        "./example"
+    ]
 }

@@ -67,18 +67,27 @@ def confirm_backup_list(info_list):
         if not os.path.isfile(getfile(info_list[i])):
             info_list.pop(i)
 
+def should_ignore(path):
+    path = os.path.abspath(path)
+    for ignore_prefix in conf.config.ignore:
+        if path.startswith(os.path.abspath(ignore_prefix)):
+            return True
+    return False
+
 def pack(target):
     with ZipFile(target, 'w', compression=ZIP_DEFLATED, allowZip64=True, compresslevel=1) as zipf:
         for root, dirs, files in os.walk('.'):
             for f in files:
-                zipf.write(os.path.join(root, f))
+                if not should_ignore(os.path.join(root, f)):
+                    zipf.write(os.path.join(root, f))
 
 def unpack(target):
     for filename in os.listdir('.'):
-        if os.path.isdir(filename):
-            shutil.rmtree(filename)
-        else:
-            os.remove(filename)
+        if not should_ignore(filename):
+            if os.path.isdir(filename):
+                shutil.rmtree(filename)
+            else:
+                os.remove(filename)
     shutil.unpack_archive(target, '.')
 
 def try_remove(backup):
