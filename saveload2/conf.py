@@ -15,7 +15,10 @@ class Config:
         self.restore_waiting = config_dict['restore-waiting-sec']
         self.restore_countdown = config_dict['restore-countdown-sec']
         self.auto_backup_interval = config_dict['auto-backup-hours']
-        self.ignore = config_dict['ignore']
+        if 'ignore' in config_dict:
+            self.ignore = config_dict['ignore']
+        else:
+            self.ignore = []
         utils.init_assert((self.permission_level == 'op') or (self.permission_level == 'any'), 'permission-level should be op or any')
         utils.init_assert(isinstance(self.max_backup_num, int) and (self.max_backup_num > 0), 'max-backup-num should be positive integer')
         utils.init_assert(os.path.isdir(self.save_path), 'save-path is not a valid directory')
