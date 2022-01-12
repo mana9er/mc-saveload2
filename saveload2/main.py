@@ -68,6 +68,16 @@ class SaveLoad(QtCore.QObject):
             'cancel': self.cancel,
             'rm ': self.remove
         }
+
+    def check_permission(self, player):
+        if conf.config.permission_level == 'op':
+            if player.is_op():
+                return True
+            if str(player) in conf.config.operators:
+                return True
+            return False
+        else:
+            return True
     
     def busy(self):
         return self.busy_backup or self.busy_restore
@@ -104,12 +114,12 @@ class SaveLoad(QtCore.QObject):
             self.core.write_server('/save-all flush')
         else:
             self.sig_backup_immediately.emit()
-    
+
     def prepare_backup(self, player, msg):
         if self.busy():
             self.mclib.tell(player, 'plugin saveload busy')
             return
-        if (conf.config.permission_level == 'op') and not player.is_op():
+        if not self.check_permission(player):
             self.mclib.tell(player, 'permission denied')
             return
         self.busy_backup = True
@@ -140,7 +150,7 @@ class SaveLoad(QtCore.QObject):
         if self.busy():
             self.mclib.tell(player, 'plugin busy')
             return
-        if (conf.config.permission_level == 'op') and not player.is_op():
+        if not self.check_permission(player):
             self.mclib.tell(player, 'permission denied')
             return
         msg = msg.strip()
@@ -163,7 +173,7 @@ class SaveLoad(QtCore.QObject):
         self.sig_prepare_restore.emit(target)
     
     def confirm(self, player, msg):
-        if (conf.config.permission_level == 'op') and not player.is_op():
+        if not self.check_permission(player):
             self.mclib.tell(player, 'permission denied')
             return
         if self.busy_restore:
@@ -206,7 +216,7 @@ class SaveLoad(QtCore.QObject):
         if self.busy():
             self.mclib.tell(player, 'plugin busy')
             return
-        if (conf.config.permission_level == 'op') and not player.is_op():
+        if not self.check_permission(player):
             self.mclib.tell(player, 'permission denied')
             return
         try:

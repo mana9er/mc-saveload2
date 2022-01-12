@@ -19,6 +19,10 @@ class Config:
             self.ignore = config_dict['ignore']
         else:
             self.ignore = []
+        if 'operators' in config_dict:
+            self.operators = config_dict['operators']
+        else:
+            self.operators = []
         utils.init_assert((self.permission_level == 'op') or (self.permission_level == 'any'), 'permission-level should be op or any')
         utils.init_assert(isinstance(self.max_backup_num, int) and (self.max_backup_num > 0), 'max-backup-num should be positive integer')
         utils.init_assert(os.path.isdir(self.save_path), 'save-path is not a valid directory')
@@ -29,6 +33,10 @@ class Config:
         utils.init_assert(isinstance(self.ignore, list), 'ignore should be a list')
         for ignore_prefix in self.ignore:
             utils.init_assert(isinstance(ignore_prefix, str), 'ignore should be a list of strings')
+        utils.init_assert(isinstance(self.operators, list), 'operators should be a list')
+        for op in self.operators:
+            utils.init_assert(isinstance(op, str), 'operators should be strings')
+        self.operators = set(self.operators)
 
 
 def load_text():
